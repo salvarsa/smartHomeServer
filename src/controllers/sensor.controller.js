@@ -1,15 +1,21 @@
 const SENSOR = require('../models/sensors.model.js');
+const {v4: uuid} = require('uuid')
 
 sensorDataSchema.index({ timestamp: -1 });
 sensorDataSchema.index({ createdAt: -1 });
 
 const getAllSensorData = async (req, res) => {
   try {
+    const limit = req.query.limit ? parseInt(req.query.limit) : 50;
     const result = await SENSOR.find({})
       .sort({ timestamp: -1 })
-      .limit(limit = 50);
+      .limit(limit);
 
-    res.status(201).json({success: true, data: result})
+    res.status(201).json({
+        success: true,
+        count: result.length, 
+        data: result
+    })
   } catch (err) {
     res.status(500).json({
         success: false, 
@@ -20,8 +26,16 @@ const getAllSensorData = async (req, res) => {
 
 const getSensorDataById = async (req, res) => {
   try {
-    const id = req.params.id
-    const result = await SENSOR.findById(id);
+    const _id = req.params._id
+    const result = await SENSOR.findById(_id);
+
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sensor data not found'
+      });
+    }
+
     res.status(200).json({success: true, data: result})
   } catch (err) {
     res.status(500).json({
@@ -33,10 +47,10 @@ const getSensorDataById = async (req, res) => {
 
 const getSensorDataWithinRange = async (req, res) => {
   try {
-    const timeRange = req.params.timeRange
+    const { timeStart, timeEnd } = req.body;
     const endTime = new Date();
-    const startTime = new Date(endTime.getTime() - (timeRange.timeEnd * 60 * 60 * 1000));
-    const filterStartTime = new Date(endTime.getTime() - (timeRange.timeStart * 60 * 60 * 1000));
+    const startTime = new Date(endTime.getTime() - (timeEnd * 60 * 60 * 1000));
+    const filterStartTime = new Date(endTime.getTime() - (timeStart * 60 * 60 * 1000));
 
     const result = await SENSOR.find({
       timestamp: {
@@ -46,7 +60,11 @@ const getSensorDataWithinRange = async (req, res) => {
     }).sort({ timestamp: -1 });
 
 
-    res.status(200).json({success: true, data: result})
+    res.status(200).json({
+        success: true,
+        count: result.length, 
+        data: result
+    })
   } catch (err) {
     res.status(500).json({
         success: false, 
@@ -58,6 +76,8 @@ const getSensorDataWithinRange = async (req, res) => {
 const createSensorData = async (req, res) => {
   try {
     const data = req.params.data
+    data._id = uuid()
+
     const sensorData = new SENSOR({
       temperature: data.temperature,
       pressure: data.pressure,
@@ -65,7 +85,7 @@ const createSensorData = async (req, res) => {
       light_intensity: data.lightIntensity
     });
 
-    const result = await SENSOR.save();
+    const result = await sensorData.save();
     res.status(200).json({success: true, data: result})
   } catch (err) {
     res.status(500).json({
@@ -77,14 +97,27 @@ const createSensorData = async (req, res) => {
 
 const deleteSensorData = async (req, res) => {
   try {
-    const id = req.params.id
-    const result = await SENSOR.findByIdAndDelete(id);
-    return result;
+    const _id = req.params._id
+    const result = await SENSOR.findByIdAndDelete(_id);
+
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sensor data not found'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Sensor data deleted successfully',
+      data: result
+    });
   } catch (err) {
-    throw new Error(`Error deleting sensor data: ${err.message}`);
+    res.status(500).json({
+      success: false,
+      message: `Error deleting sensor data: ${err.message}`
+    });
   }
 };
-
 
 module.exports = {
   getAllSensorData,
