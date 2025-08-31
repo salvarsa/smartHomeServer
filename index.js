@@ -1,6 +1,7 @@
-const express = require('express')
+const express = require('express');
+const mqtt = require('mqtt');
 const bodyParser = require('body-parser');
-const { connectDb } = require('./src/config/db.js')
+const { connectDb } = require('./src/config/db.js');
 
 const app = express()
 app.use(bodyParser.json())
