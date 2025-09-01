@@ -12,9 +12,6 @@ const connectDb = async () => {
     }
 }
 
-// Manejo de eventos de conexión
-const mongoose = require('mongoose');
-
 mongoose.connection.on('connected', () => {
     console.log('📡 Mongoose connected to MongoDB Atlas');
 });

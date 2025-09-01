@@ -1,9 +1,6 @@
 const SENSOR = require('../models/sensors.model.js');
 const {v4: uuid} = require('uuid')
 
-sensorDataSchema.index({ timestamp: -1 });
-sensorDataSchema.index({ createdAt: -1 });
-
 const getAllSensorData = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit) : 50;
@@ -53,7 +50,7 @@ const getSensorDataWithinRange = async (req, res) => {
     const filterStartTime = new Date(endTime.getTime() - (timeStart * 60 * 60 * 1000));
 
     const result = await SENSOR.find({
-      timestamp: {
+      updatedAt: {
         $gte: startTime,
         $lte: filterStartTime
       }
@@ -75,7 +72,7 @@ const getSensorDataWithinRange = async (req, res) => {
 
 const createSensorData = async (req, res) => {
   try {
-    const data = req.params.data
+    const data = req.body
     data._id = uuid()
 
     const sensorData = new SENSOR({

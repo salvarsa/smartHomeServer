@@ -8,6 +8,7 @@ const schema = new Schema({
     airQuality: { type: Number, default: 0 },
     pressure: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
     isRemove: { type: Boolean, default: false },
 }, {
   strict: true,

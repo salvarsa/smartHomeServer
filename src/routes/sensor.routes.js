@@ -1,5 +1,5 @@
 const express = require('express');
-const senserRouter = express.Router()
+const sensorRouter = express.Router()
 const {
   getAllSensorData,
   getSensorDataById,
@@ -8,13 +8,13 @@ const {
   deleteSensorData
 } = require('../controllers/sensor.controller.js');
 
-senserRouter.use(express.json());
+sensorRouter.use(express.json());
 
-senserRouter.route('/').get(getAllSensorData);
-senserRouter.route('/:id').get(getSensorDataById);
-senserRouter.route('/').post(createSensorData);
-senserRouter.route('/search').post(getSensorDataWithinRange);
-senserRouter.delete('/:id').delete(deleteSensorData);
+sensorRouter.route('/').get(getAllSensorData);
+sensorRouter.route('/:id').get(getSensorDataById);
+sensorRouter.route('/').post(createSensorData);
+sensorRouter.route('/search').post(getSensorDataWithinRange);
+//sensorRouter.delete('/:id').delete(deleteSensorData);
 
 
-module.exports = router
+module.exports = sensorRouter
